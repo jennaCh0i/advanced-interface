@@ -61,56 +61,58 @@ h1{font-weight:300;font-size:clamp(38px,6vw,56px);letter-spacing:-.02em;line-hei
 .cap-ind .knob,.cap-det .knob{position:absolute;top:0;left:0;width:32px;height:32px;border-radius:50%;background:var(--bg-canvas);transition:transform var(--settle) var(--ease)}
 .cap-ind .pill:nth-child(1){top:70px}.cap-ind .pill:nth-child(2){top:104px}.cap-ind .pill:nth-child(3){top:138px}
 .cap-ind.run .pill::before{opacity:1}
-.cap-ind.run .knob{animation:shuttle var(--breath) var(--ease) infinite}
-.cap-ind.run .pill:nth-child(2) .knob{animation-delay:calc(var(--breath) / -2)}
-.cap-ind.run .pill:nth-child(3) .knob{animation-delay:-.6s}
-@keyframes shuttle{0%,12%{transform:translateX(0)}45%,62%{transform:translateX(88px)}95%,100%{transform:translateX(0)}}
+/* knobs drift continuously on a long, sine-like glide; each row is a third of a cycle apart */
+.cap-ind.run .knob{animation:glide 9.6s cubic-bezier(.37,0,.63,1) infinite alternate}
+.cap-ind.run .pill:nth-child(2) .knob{animation-delay:-6.4s}
+.cap-ind.run .pill:nth-child(3) .knob{animation-delay:-3.2s}
+@keyframes glide{from{transform:translateX(0)}to{transform:translateX(88px)}}
 .cap-ind.done .pill{background:var(--complete);box-shadow:var(--glow-complete)}
 .cap-ind.done .knob{transform:translateX(88px)}
 
 .cap-det .track{position:absolute;left:20px;top:112px;width:200px;height:32px;border-radius:16px;background:var(--track)}
-.cap-det .fill{position:absolute;left:0;top:0;height:32px;border-radius:16px;background:var(--g-capsule);transition:width .5s var(--ease),background var(--settle) var(--ease),box-shadow var(--settle) var(--ease)}
+.cap-det .fill{position:absolute;left:0;top:0;height:32px;border-radius:16px;background:var(--g-capsule);transition:background var(--settle) var(--ease),box-shadow var(--settle) var(--ease)}
 .cap-det.done .fill{background:var(--complete);box-shadow:var(--glow-complete)}
-.cap-det .knob{transition:transform .5s var(--ease)}
-.cap-det .pct{position:absolute;top:84px;font-family:var(--mono);font-size:14px;font-weight:500;transform:translateX(-50%);transition:left .5s var(--ease),color var(--settle);font-variant-numeric:tabular-nums}
+.cap-det .knob{transition:none}
+.cap-det .pct{position:absolute;top:84px;font-family:var(--mono);font-size:14px;font-weight:500;transform:translateX(-50%);transition:color var(--settle);font-variant-numeric:tabular-nums}
 .cap-det.done .pct{color:var(--complete)}
 
 /* ---------- 02 PETAL ---------- */
 .petals{position:absolute;inset:0;--r:34px;transition:--r var(--settle)}
 .petals .petal{position:absolute;left:108px;top:103px;width:24px;height:34px;transform:rotate(var(--a)) translateY(calc(var(--r) * -1));transition:transform var(--settle) var(--ease)}
 .petals .leaf{width:100%;height:100%;border-radius:50%;background:var(--g-dusk);transform:perspective(160px) rotateY(0deg);transition:background var(--settle) var(--ease),box-shadow var(--settle) var(--ease),transform .6s var(--ease)}
-.petals .heart{position:absolute;left:110px;top:110px;width:20px;height:20px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent);opacity:0;transform:scale(.4);transition:all var(--settle) var(--ease)}
-/* indeterminate: each petal flips on its own long axis, the flip travels around the ring */
+/* indeterminate: every petal is always turning on its long axis; neighbours are a sixth of a turn apart,
+   so one turn is still under way when the next begins — a continuous wave with no stops */
 .pet-ind.zero .leaf{background:var(--track)}
 .pet-ind.run .spin{animation:turn calc(var(--breath) * 4) linear infinite}
 .pet-ind .spin{position:absolute;inset:0}
-.pet-ind.run .leaf{animation:flip var(--breath) var(--ease) infinite;animation-delay:calc(var(--i) * var(--breath) / 6 - var(--breath))}
-@keyframes flip{0%{transform:perspective(160px) rotateY(0) scale(1)}30%{transform:perspective(160px) rotateY(180deg) scale(.86)}100%{transform:perspective(160px) rotateY(180deg) scale(1)}}
+.pet-ind.run .leaf{animation:flip var(--breath) linear infinite;animation-delay:calc(var(--i) * var(--breath) / -6)}
+@keyframes flip{from{transform:perspective(160px) rotateY(0deg)}to{transform:perspective(160px) rotateY(180deg)}}
 @keyframes turn{to{transform:rotate(360deg)}}
+.pet-det .leaf{transition:background var(--settle) var(--ease),box-shadow var(--settle) var(--ease)}
 .pet-ind.done .petals,.pet-det.done .petals{--r:27px}
 .pet-ind.done .petal,.pet-det.done .petal{transform:rotate(var(--a)) translateY(-27px) scale(.9)}
 .pet-ind.done .leaf,.pet-det.done .leaf{background:var(--complete);box-shadow:var(--glow-complete);transform:perspective(160px) rotateY(0)}
-.pet-ind.done .heart,.pet-det.done .heart{opacity:1;transform:scale(1)}
 .pet-det .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;transition:opacity var(--settle)}
 .pet-det.done .pct{opacity:0}
 
 /* ---------- 03 POOL ---------- */
-.pool .sq{position:absolute;left:50%;top:50%;translate:-50% -50%;background:var(--g-pool);transition:opacity var(--settle) var(--ease),background var(--settle) var(--ease),box-shadow var(--settle) var(--ease),border-color var(--settle)}
+/* Matches the Figma build: each layer is Gradient/Pool (radial) with a Screen blend, stacked */
+.pool{isolation:isolate}
+.pool .sq{position:absolute;left:50%;top:50%;translate:-50% -50%;background:var(--g-pool);mix-blend-mode:screen;transition:opacity var(--settle) var(--ease),background var(--settle) var(--ease),box-shadow var(--settle) var(--ease),border-color var(--settle)}
+.pool .tr{position:absolute;left:50%;top:50%;translate:-50% -50%;border:1px solid var(--border-strong);background:transparent}
+.pool .tr.s1{background:var(--bg-raised)}
 .pool .s1{width:150px;height:150px;border-radius:36px}.pool .s2{width:122px;height:122px;border-radius:30px}
 .pool .s3{width:92px;height:92px;border-radius:24px}.pool .s4{width:66px;height:66px;border-radius:18px}
-.pool-ind.zero .sq{background:var(--track)}
+.pool-ind.zero .sq{background:var(--track);mix-blend-mode:normal}
 .pool-ind.zero .s1{opacity:.35}.pool-ind.zero .s2{opacity:.5}.pool-ind.zero .s3{opacity:.65}.pool-ind.zero .s4{opacity:.8}
 .pool-ind.run .sq{animation:ripple var(--breath) var(--ease) infinite}
 .pool-ind.run .s3{animation-delay:.3s}.pool-ind.run .s2{animation-delay:.6s}.pool-ind.run .s1{animation-delay:.9s}
 @keyframes ripple{0%,100%{scale:.94;opacity:.7}50%{scale:1.03;opacity:1}}
 .pool-ind .light{position:absolute;left:106px;top:106px;width:28px;height:28px;border-radius:50%;background:var(--complete);box-shadow:var(--glow-complete);opacity:0;transform:scale(.3);transition:all var(--settle) var(--ease)}
 .pool-ind.done .light{opacity:1;transform:scale(1)}
-.pool-ind.done .s1{box-shadow:var(--glow-accent)}
-.pool-det .sq{border:1px solid var(--border-strong)}
-.pool-det .sq::after{content:"";position:absolute;inset:-1px;border-radius:inherit;background:var(--g-pool);opacity:var(--f,0);transition:opacity .5s var(--ease)}
-.pool-det .sq{background:var(--bg-raised)}
+.pool-ind.done .sq{opacity:1}
+.pool-det .sq{opacity:var(--f,0);transition:box-shadow var(--settle) var(--ease)}
 .pool-det .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;z-index:2;transition:color .5s var(--ease)}
-.pool-det.done .s1{box-shadow:var(--glow-accent)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
 footer{margin-top:64px;color:var(--text-tertiary);font-size:13px;max-width:70ch}
@@ -127,7 +129,7 @@ footer{margin-top:64px;color:var(--text-tertiary);font-size:13px;max-width:70ch}
 
   <section class="concept">
     <div><div class="cap">Concept 01</div><h2>Capsule</h2>
-      <p>Pills with dark knobs. In the indeterminate loader, the knobs slide across their pills in a slow, offset rhythm. In the determinate loader, one knob moves along the track and the gradient fill follows it.</p></div>
+      <p>Pills with dark knobs. In the indeterminate loader, the knobs glide back and forth over 9.6s, each a third of a cycle apart, so they never all move together. In the determinate loader, one knob moves along the track and the gradient fill follows it.</p></div>
     <div class="pair">
       <div class="spec" data-key="cap-ind" data-kind="ind"><div class="stage" role="progressbar" aria-label="Capsule indeterminate loader"><div class="rig cap-ind">
         <div class="pill"><div class="knob"></div></div><div class="pill"><div class="knob"></div></div><div class="pill"><div class="knob"></div></div>
@@ -140,7 +142,7 @@ footer{margin-top:64px;color:var(--text-tertiary);font-size:13px;max-width:70ch}
   <section class="concept">
     <div><div class="cap">Concept 02</div><h2>Petal <span class="new">flip motion</span></h2>
       <p>Six petals, each turning on its own long axis like a coin. Progress is shown by the turning itself, not by color or brightness.</p>
-      <p>In the indeterminate loader, a flip passes around the ring once every 4.8s while the whole flower drifts slowly. In the determinate loader, each petal starts edge-on as a thin sliver and turns to face you as its sixth of the progress fills.</p></div>
+      <p>In the indeterminate loader, every petal is always turning, each a sixth of a turn behind its neighbour, so the movement never stops. In the determinate loader, the petals start edge-on and turn to face you in overlapping sequence as progress fills.</p></div>
     <div class="pair">
       <div class="spec" data-key="pet-ind" data-kind="ind"><div class="stage" role="progressbar" aria-label="Petal indeterminate loader"><div class="rig pet-ind">
         <div class="spin"><div class="petals"></div></div><div class="lbl">READY</div></div></div></div>
@@ -151,11 +153,12 @@ footer{margin-top:64px;color:var(--text-tertiary);font-size:13px;max-width:70ch}
 
   <section class="concept">
     <div><div class="cap">Concept 03</div><h2>Pool</h2>
-      <p>Concentric rounded squares, like ripples in still water. In the indeterminate loader, the ripples swell outward from the center. In the determinate loader, the rings fill in from the center out, and a light appears when it's done.</p></div>
+      <p>Concentric rounded squares, like ripples in still water. Each layer is a radial gradient set to Screen, so where the layers overlap they add up to a white glow at the center. In the indeterminate loader, the ripples swell outward from the center. In the determinate loader, the rings fill in from the center out, and all four layers glow together at Complete.</p></div>
     <div class="pair">
       <div class="spec" data-key="pool-ind" data-kind="ind"><div class="stage" role="progressbar" aria-label="Pool indeterminate loader"><div class="rig pool pool-ind">
-        <div class="sq s1"></div><div class="sq s2"></div><div class="sq s3"></div><div class="sq s4"></div><div class="light"></div></div></div></div>
+        <div class="sq s1"></div><div class="sq s2"></div><div class="sq s3"></div><div class="sq s4"></div></div></div></div>
       <div class="spec" data-key="pool-det" data-kind="det"><div class="stage" role="progressbar" aria-label="Pool determinate loader" aria-valuemin="0" aria-valuemax="100"><div class="rig pool pool-det">
+        <div class="tr s1"></div><div class="tr s2"></div><div class="tr s3"></div><div class="tr s4"></div>
         <div class="sq s1"></div><div class="sq s2"></div><div class="sq s3"></div><div class="sq s4"></div><div class="pct">0%</div></div></div></div>
     </div>
   </section>
@@ -168,8 +171,10 @@ footer{margin-top:64px;color:var(--text-tertiary);font-size:13px;max-width:70ch}
 // build petals
 document.querySelectorAll('.petals').forEach(p=>{
   let h='';for(let i=0;i<6;i++) h+=`<div class="petal" style="--a:${i*60}deg;--i:${i}"><div class="leaf"></div></div>`;
-  p.innerHTML=h+'<div class="heart"></div>';
+  p.innerHTML=h;
 });
+const clamp=x=>Math.min(1,Math.max(0,x));
+const smooth=x=>{x=clamp(x);return x*x*(3-2*x);};
 const cls=(el,s,base)=>{el.className=base+' '+({zero:'zero',progress:'run',complete:'done'}[s]);};
 const R={
   'cap-ind'(r,s){cls(r,s,'rig cap-ind');r.querySelector('.lbl').textContent={zero:'READY',progress:'SYNCING',complete:'DONE'}[s];},
@@ -178,11 +183,12 @@ const R={
     const p=r.querySelector('.pct');p.textContent=Math.round(v*100)+'%';p.style.left=Math.min(Math.max(20+x+16,40),200)+'px';},
   'pet-ind'(r,s){cls(r,s,'rig pet-ind');r.querySelector('.lbl').textContent={zero:'READY',progress:'GATHERING',complete:'BLOOMED'}[s];},
   'pet-det'(r,s,v){r.classList.toggle('done',s==='complete');
-    r.querySelectorAll('.leaf').forEach((l,i)=>{const t=Math.min(1,Math.max(0,v*6-i));l.style.transform=s==='complete'?'':`perspective(160px) rotateY(${(1-t)*84}deg)`;});
+    // each petal's turn spans ~1.8 sixths of the progress, so neighbouring turns overlap
+    r.querySelectorAll('.leaf').forEach((l,i)=>{const t=smooth((v*6.8-i)/1.8);l.style.transform=s==='complete'?'perspective(160px) rotateY(0deg)':`perspective(160px) rotateY(${(1-t)*86}deg)`;});
     r.querySelector('.pct').textContent=Math.round(v*100);},
   'pool-ind'(r,s){cls(r,s,'rig pool pool-ind');},
   'pool-det'(r,s,v){r.classList.toggle('done',s==='complete');
-    r.querySelectorAll('.sq').forEach((q,i)=>{const f=Math.min(1,Math.max(0,v*4-(3-i)));q.style.setProperty('--f',f);});
+    r.querySelectorAll('.sq').forEach((q,i)=>{q.style.setProperty('--f',smooth((v*4.6-(3-i))/1.6));});
     const p=r.querySelector('.pct');p.textContent=Math.round(v*100)+'%';p.style.color=v>=.25?'#0A0A0B':'var(--text-primary)';}
 };
 document.querySelectorAll('.spec').forEach((spec,i)=>{
@@ -192,13 +198,18 @@ document.querySelectorAll('.spec').forEach((spec,i)=>{
    <div class="ctrl" role="group" aria-label="${title} state">${['auto','zero','progress','complete'].map(m=>`<button type="button" data-m="${m}" aria-pressed="${m==='auto'}">${m[0].toUpperCase()+m.slice(1)}</button>`).join('')}
    ${kind==='det'?`<input type="range" id="scrub-${key}" min="0" max="100" value="0" aria-label="Scrub progress">`:''}</div>`);
   const chip=spec.querySelector('.chip'),range=spec.querySelector('input');
-  let v=0,timer=null,sim=null;
+  let v=0,d=0,state='zero',timer=null,sim=null,dirty=true;
   const press=m=>spec.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
-  function show(s){chip.textContent=s;chip.dataset.s=s;R[key](rig,s,v);stage.setAttribute('aria-valuetext',s);
-    if(kind==='det'){stage.setAttribute('aria-valuenow',Math.round(v*100));if(range)range.value=Math.round(v*100);}}
+  // v is the real progress; d is the displayed value, which glides toward v every frame
+  function show(s){state=s;chip.textContent=s;chip.dataset.s=s;stage.setAttribute('aria-valuetext',s);dirty=true;
+    if(kind==='det'){stage.setAttribute('aria-valuenow',Math.round(v*100));if(range&&document.activeElement!==range)range.value=Math.round(v*100);}
+    else R[key](rig,s,v);}
+  if(kind==='det'){const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    (function tick(){const gap=v-d;if(Math.abs(gap)>.0004){d=reduce?v:d+gap*.055;dirty=true;}else if(d!==v){d=v;dirty=true;}
+      if(dirty){R[key](rig,state,d);dirty=false;}requestAnimationFrame(tick);})();}
   function stop(){clearTimeout(timer);clearInterval(sim);}
-  function simulate(done){v=0;show('progress');sim=setInterval(()=>{v=Math.min(1,v+(Math.random()<.15?0:.004+Math.random()*.018));show('progress');
-    if(v>=1){clearInterval(sim);timer=setTimeout(done,500);}},90);}
+  function simulate(done){v=0;show('progress');sim=setInterval(()=>{v=Math.min(1,v+.006+Math.random()*.01);show('progress');
+    if(v>=1){clearInterval(sim);timer=setTimeout(done,900);}},90);}
   function cycle(){stop();v=0;show('zero');timer=setTimeout(()=>{
     if(kind==='det') simulate(()=>{show('complete');timer=setTimeout(cycle,3000);});
     else{show('progress');timer=setTimeout(()=>{show('complete');timer=setTimeout(cycle,3000);},7200);}},1600);}
@@ -208,7 +219,7 @@ document.querySelectorAll('.spec').forEach((spec,i)=>{
   spec.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
   if(range)range.addEventListener('input',()=>{stop();press('progress');v=range.value/100;show('progress');});
   // open mid-progress so the first frame shows working loaders
-  v=kind==='det'?.45:0;show('progress');timer=setTimeout(cycle,3200+i*500);
+  v=d=kind==='det'?.45:0;show('progress');timer=setTimeout(cycle,3200+i*500);
 });
 })();
 </script>
